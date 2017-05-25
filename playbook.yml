@@ -2,6 +2,14 @@
 - hosts: all
   become: true
   tasks:
+
+    - name: Get the broker id from the hostname
+      shell: hostname | awk '{print substr($0,length,1)}'
+      register: brokerid
+
+    - name: Get the broker id into a fact
+      set_fact: kafka_broker_id={{ brokerid.stdout_lines[0] }}
+
     - name: Install Confluent repository key
       rpm_key:
         state: present
@@ -60,15 +68,16 @@
         group: root
         mode: 0644
 
+    - file:
+        path: /var/lib/zookeeper
+        state: directory
+        mode: 0755
+
+    - name: Create Zookeeper myid file
+      shell: echo '{{ kafka_broker_id }}' > /var/lib/zookeeper/myid
+
     - name: Start Zookeeper
       command: /usr/bin/zookeeper-server-start -daemon /etc/kafka/zookeeper.properties
-
-    - name: Get the broker id from the hostname
-      shell: hostname | awk '{print substr($0,length,1)}'
-      register: brokerid
-
-    - name: Get the broker id into a fact
-      set_fact: kafka_broker_id={{ brokerid.stdout_lines[0] }}
 
     - template:
         src: server.properties.j2
