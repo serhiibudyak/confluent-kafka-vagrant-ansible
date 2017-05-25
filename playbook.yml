@@ -10,7 +10,7 @@
     - name: Configure Confluent yum repository
       blockinfile:
         create: yes
-        path: /etc/yum.reposd/confluent
+        path: /etc/yum.repos.d/confluent.repo
         block: |
           [Confluent.dist]
           name=Confluent repository (dist)
@@ -18,7 +18,6 @@
           gpgcheck=1
           gpgkey=http://packages.confluent.io/rpm/3.2/archive.key
           enabled=1
-
           [Confluent]
           name=Confluent repository
           baseurl=http://packages.confluent.io/rpm/3.2
@@ -28,13 +27,20 @@
 
     - name: yum-clean-metadata
       command: yum clean metadata
-        args:
+      args:
         warn: no
 
-    - name: Install Confluent Open Source
+    - name: Upgrade all packages and update the repos
       yum:
-        name: confluent-platform-oss-2.11
-        state: present
+        name: '*'
+        state: latest
+
+    - name: Install packages
+      yum: state=present name={{ item }}
+      with_items:
+      - nc
+      - java-1.7.0-openjdk-headless
+      - confluent-platform-oss-2.11
 
     - name: Stop firewalld service due to conflicts with Docker
       systemd:
@@ -42,7 +48,34 @@
         name: firewalld
         enabled: no
 
-    - name: set SELinux to permissive
+    - name: Set SELinux to permissive
       selinux:
         policy: targeted
         state: permissive
+
+    - template:
+        src: zookeeper.properties.j2
+        dest: /etc/kafka/zookeeper.properties
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Start Zookeeper
+      command: /usr/bin/zookeeper-server-start -daemon /etc/kafka/zookeeper.properties
+
+    - name: Get the broker id from the hostname
+      shell: hostname | awk '{print substr($0,length,1)}'
+      register: brokerid
+
+    - name: Get the broker id into a fact
+      set_fact: kafka_broker_id={{ brokerid.stdout_lines[0] }}
+
+    - template:
+        src: server.properties.j2
+        dest: /etc/kafka/server.properties
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Start Kafka
+      command: /usr/bin/kafka-server-start -daemon /etc/kafka/server.properties
