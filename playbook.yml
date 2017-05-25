@@ -47,6 +47,7 @@
       yum: state=present name={{ item }}
       with_items:
       - nc
+      - telnet
       - java-1.7.0-openjdk-headless
       - confluent-platform-oss-2.11
 
@@ -76,9 +77,6 @@
     - name: Create Zookeeper myid file
       shell: echo '{{ kafka_broker_id }}' > /var/lib/zookeeper/myid
 
-    - name: Start Zookeeper
-      command: /usr/bin/zookeeper-server-start -daemon /etc/kafka/zookeeper.properties
-
     - template:
         src: server.properties.j2
         dest: /etc/kafka/server.properties
@@ -86,8 +84,15 @@
         group: root
         mode: 0644
 
+    - name: Start Zookeeper
+      command: /usr/bin/zookeeper-server-start -daemon /etc/kafka/zookeeper.properties
+
     - name: Start Kafka
       command: /usr/bin/kafka-server-start -daemon /etc/kafka/server.properties
+
+- hosts: broker3
+  become: true
+  tasks:
 
     - name: Add a test topic r=3
       command: /usr/bin/kafka-topics --create --zookeeper 192.168.33.10:2181 --replication-factor 3 --partitions 1 --topic test
