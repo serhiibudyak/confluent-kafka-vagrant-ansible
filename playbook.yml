@@ -1,0 +1,48 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Confluent repository key
+      rpm_key:
+        state: present
+        key: http://packages.confluent.io/rpm/3.2/archive.key
+
+    - name: Configure Confluent yum repository
+      blockinfile:
+        create: yes
+        path: /etc/yum.reposd/confluent
+        block: |
+          [Confluent.dist]
+          name=Confluent repository (dist)
+          baseurl=http://packages.confluent.io/rpm/3.2/7
+          gpgcheck=1
+          gpgkey=http://packages.confluent.io/rpm/3.2/archive.key
+          enabled=1
+
+          [Confluent]
+          name=Confluent repository
+          baseurl=http://packages.confluent.io/rpm/3.2
+          gpgcheck=1
+          gpgkey=http://packages.confluent.io/rpm/3.2/archive.key
+          enabled=1
+
+    - name: yum-clean-metadata
+      command: yum clean metadata
+        args:
+        warn: no
+
+    - name: Install Confluent Open Source
+      yum:
+        name: confluent-platform-oss-2.11
+        state: present
+
+    - name: Stop firewalld service due to conflicts with Docker
+      systemd:
+        state: stopped
+        name: firewalld
+        enabled: no
+
+    - name: set SELinux to permissive
+      selinux:
+        policy: targeted
+        state: permissive
