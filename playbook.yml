@@ -42,7 +42,7 @@
       - java-1.7.0-openjdk-headless
       - confluent-platform-oss-2.11
 
-    - name: Stop firewalld service due to conflicts with Docker
+    - name: Stop firewalld service
       systemd:
         state: stopped
         name: firewalld
@@ -79,3 +79,6 @@
 
     - name: Start Kafka
       command: /usr/bin/kafka-server-start -daemon /etc/kafka/server.properties
+
+    - name: Add a test topic r=3
+      command: /usr/bin/kafka-topics --create --zookeeper 192.168.33.10:2181 --replication-factor 3 --partitions 1 --topic test
