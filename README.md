@@ -34,7 +34,7 @@ accordingly over the same port. You can also configure plaintext and SSL on diff
 
 # Prerequisites
 
-## On OSX:
+## On OSX
 ```
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew cask install virtualbox
@@ -60,13 +60,14 @@ cd secrets
 ```
 
 Run Vagrant
+
 `vagrant up`
 
 This'll take between 5-10 minutes to complete due to package downloads and installs. This can be greatly reduced
 by configuring a custom Vagrant box with those steps already completed, I have it down to just under 3 minutes.
 
 You'll want to let the cluster coordinate itself before creating the test topic otherwise you may find, not all
-Brokers are in sync.  Logs can be found in /var/log/kafka/kafkaServer.out
+Brokers are in sync.  Logs can be found in `/var/log/kafka/kafkaServer.out`
 
 ## SSL Testing
 
@@ -77,16 +78,19 @@ Create a test topic
 ```
 
 Test Kafka's talking SSL on TCP:9092
+
 `openssl s_client -debug -connect localhost:9092 -tls1`
 
 Test talking SSL through the console producer on Broker1
+
 `/usr/bin/kafka-console-producer --broker-list localhost:9092 --topic test --producer.config /vagrant/secrets/host.producer.ssl.config`
 
 And, in parallel listen on Broker2
+
 `/usr/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic test --consumer.config /vagrant/secrets/host.consumer.ssl.config`
 
-Write some messages on Broker1 and see them appear on Broker2. You can test again by removing the --producer.config and --consumer.config lines.
-This should not now work as the console clients can't authenticate.
+Write some messages on Broker1 and see them appear on Broker2. You can test again by removing the `--producer.config` and `--consumer.config`
+options. This should not now work, as the console clients can't authenticate.
 
 
 ## References
@@ -94,9 +98,11 @@ This should not now work as the console clients can't authenticate.
 In my opinion, the Apache Kafka docs are clearer than Confluent's
 
 https://kafka.apache.org/documentation/#security
+
 http://docs.confluent.io/current/kafka/ssl.html
 
 ## Credits
 
 create-certs.sh is Confluent's and updated to not prompt and output for the hosts in this example.
+
 https://github.com/confluentinc/cp-docker-images/blob/v3.2.1/examples/kafka-cluster-ssl/secrets/create-certs.sh
