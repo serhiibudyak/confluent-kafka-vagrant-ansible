@@ -83,7 +83,8 @@
         group: root
         mode: 0644
 
-    - file:
+    - name: Create the Zookeeper directory
+      file:
         path: /var/lib/zookeeper
         state: directory
         mode: 0755
@@ -103,10 +104,3 @@
 
     - name: Start Kafka
       command: /usr/bin/kafka-server-start -daemon /etc/kafka/server.properties
-
-- hosts: broker3
-  become: true
-  tasks:
-
-    - name: Add a test topic r=3
-      command: /usr/bin/kafka-topics --create --zookeeper 192.168.33.10:2181 --replication-factor 3 --partitions 1 --topic test
