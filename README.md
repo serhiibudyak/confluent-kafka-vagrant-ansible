@@ -11,7 +11,7 @@ SSL. As a good security practicioner, you won't want to rely solely on this, Kaf
 grained control. SSL is used for Client<->Broker and Broker<->Broker authentication, with the SSL certs also enabling TLS encryption
 of network traffic.
 
-Here's the flow:
+Here's the flow - and note, the assets can be generated on any host, it doesn't have to be on the Kafka cluster itself:
 
 1. Generate an SSL certificate and key for each Broker and one for a consumer and producer client
 2. Create a certifcate authority (CA)
@@ -83,11 +83,11 @@ Test Kafka's talking SSL on TCP:9092
 
 Test talking SSL through the console producer on Broker1
 
-`/usr/bin/kafka-console-producer --broker-list localhost:9092 --topic test --producer.config /vagrant/secrets/host.producer.ssl.config`
+`/usr/bin/kafka-console-producer --broker-list localhost:9092 --topic test --producer.config \ /vagrant/secrets/host.producer.ssl.config`
 
 And, in parallel listen on Broker2
 
-`/usr/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic test --consumer.config /vagrant/secrets/host.consumer.ssl.config`
+`/usr/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic test --consumer.config \ /vagrant/secrets/host.consumer.ssl.config`
 
 Write some messages on Broker1 and see them appear on Broker2. You can test again by removing the `--producer.config` and `--consumer.config`
 options. This should not now work, as the console clients can't authenticate.
