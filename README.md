@@ -66,6 +66,8 @@ Run Vagrant
 This'll take between 5-10 minutes to complete due to package downloads and installs. This can be greatly reduced
 by configuring a custom Vagrant box with those steps already completed, I have it down to just under 3 minutes.
 
+https://aggress.github.io/vagrant-custom-box
+
 You'll want to let the cluster coordinate itself before creating the test topic otherwise you may find, not all
 Brokers are in sync.  Logs can be found in `/var/log/kafka/kafkaServer.out`
 
