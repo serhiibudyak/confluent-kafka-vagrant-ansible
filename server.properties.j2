@@ -155,3 +155,12 @@ confluent.support.metrics.enable=false
 # that additional support metrics will be collected and reported.
 #
 confluent.support.customer.id=anonymous
+
+listeners=SSL://:9092
+advertised.listeners=SSL://:9092
+ssl.keystore.location=/vagrant/secrets/kafka.broker{{ kafka_broker_id }}.keystore.jks
+ssl.keystore.password=confluent
+ssl.key.password=confluent
+ssl.truststore.location=/vagrant/secrets/kafka.broker{{ kafka_broker_id }}.truststore.jks
+ssl.truststore.password=confluent
+security.inter.broker.protocol=SSL

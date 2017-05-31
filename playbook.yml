@@ -51,6 +51,20 @@
       - java-1.7.0-openjdk-headless
       - confluent-platform-oss-2.11
 
+    - name: Set soft ulimits
+      pam_limits:
+        domain: "*"
+        limit_type: soft
+        limit_item: nofile
+        value: 64000
+
+    - name: Set hard ulimits
+      pam_limits:
+        domain: "*"
+        limit_type: hard
+        limit_item: nofile
+        value: 64000
+
     - name: Stop firewalld service
       systemd:
         state: stopped
